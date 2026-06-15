@@ -1,9 +1,18 @@
+export interface IglesiaLocation {
+  direccion?: string
+  lat?: number
+  lng?: number
+}
+
 export interface IglesiaOption {
   /** Identificador estable (slug): `{bloqueId}|{iglesiaSlug}` */
   id: string
   name: string
   bloque: string
   bloqueId: string
+  direccion?: string
+  lat?: number
+  lng?: number
 }
 
 export interface IglesiaBloque {
@@ -18,7 +27,7 @@ export interface IglesiasApiMeta {
   sourceFile?: string
 }
 
-export type IglesiasSource = 'json' | 'odoo' | 'fallback'
+export type IglesiasSource = 'json' | 'odoo' | 'api' | 'fallback'
 
 export interface IglesiasApiResponse {
   source: IglesiasSource
@@ -28,8 +37,11 @@ export interface IglesiasApiResponse {
   meta: IglesiasApiMeta
 }
 
-/** Formato crudo del archivo `server/data/iglesias-bloques.json` */
+/** Entrada de iglesia en el catálogo crudo (string o objeto con ubicación) */
+export type IglesiaRawEntry = string | ({ nombre: string } & IglesiaLocation)
+
+/** Formato crudo del catálogo (JSON local o SELECTOR-IGLESIAS-API) */
 export interface IglesiaBloqueRaw {
   bloque: string
-  iglesias: string[]
+  iglesias: IglesiaRawEntry[]
 }

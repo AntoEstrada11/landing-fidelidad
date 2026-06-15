@@ -22,3 +22,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# Analytics data (generated at runtime)
+server/data/analytics/events.jsonl
