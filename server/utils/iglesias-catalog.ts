@@ -2,6 +2,7 @@ import type {
   IglesiaBloque,
   IglesiaBloqueRaw,
   IglesiaOption,
+  IglesiaRawEntry,
   IglesiasApiResponse
 } from '#shared/types/iglesia'
 import { slugify } from './slug'
@@ -13,6 +14,28 @@ function buildIglesiaId(bloqueId: string, name: string, occurrence: number): str
     return `${bloqueId}|${nameSlug}`
   }
   return `${bloqueId}|${nameSlug}-${occurrence + 1}`
+}
+
+function parseRawIglesiaEntry(entry: IglesiaRawEntry): {
+  name: string
+  direccion?: string
+  lat?: number
+  lng?: number
+} | null {
+  if (typeof entry === 'string') {
+    const name = entry.trim()
+    return name ? { name } : null
+  }
+
+  const name = entry?.nombre?.trim()
+  if (!name) return null
+
+  return {
+    name,
+    direccion: entry.direccion?.trim() || undefined,
+    lat: typeof entry.lat === 'number' ? entry.lat : undefined,
+    lng: typeof entry.lng === 'number' ? entry.lng : undefined
+  }
 }
 
 function normalizeRawCatalog(raw: IglesiaBloqueRaw[]): IglesiaBloque[] {
@@ -28,20 +51,23 @@ function normalizeRawCatalog(raw: IglesiaBloqueRaw[]): IglesiaBloque[] {
     const nameCounts = new Map<string, number>()
     const iglesias: IglesiaOption[] = []
 
-    for (const rawName of entry.iglesias ?? []) {
-      const name = rawName?.trim()
-      if (!name) {
+    for (const rawItem of entry.iglesias ?? []) {
+      const parsed = parseRawIglesiaEntry(rawItem)
+      if (!parsed) {
         continue
       }
 
-      const occurrence = nameCounts.get(name) ?? 0
-      nameCounts.set(name, occurrence + 1)
+      const occurrence = nameCounts.get(parsed.name) ?? 0
+      nameCounts.set(parsed.name, occurrence + 1)
 
       iglesias.push({
-        id: buildIglesiaId(bloqueId, name, occurrence),
-        name,
+        id: buildIglesiaId(bloqueId, parsed.name, occurrence),
+        name: parsed.name,
         bloque: bloqueLabel,
-        bloqueId
+        bloqueId,
+        ...(parsed.direccion ? { direccion: parsed.direccion } : {}),
+        ...(parsed.lat !== undefined ? { lat: parsed.lat } : {}),
+        ...(parsed.lng !== undefined ? { lng: parsed.lng } : {})
       })
     }
 
@@ -65,20 +91,27 @@ function flattenBloques(bloques: IglesiaBloque[]): IglesiaOption[] {
   return bloques.flatMap((bloque) => bloque.iglesias)
 }
 
-export function loadIglesiasFromJson(): IglesiasApiResponse {
-  const bloques = normalizeRawCatalog(rawCatalog as IglesiaBloqueRaw[])
+export function buildIglesiasFromRawBloques(
+  raw: IglesiaBloqueRaw[],
+  source: IglesiasApiResponse['source'] = 'json'
+): IglesiasApiResponse {
+  const bloques = normalizeRawCatalog(raw)
   const items = flattenBloques(bloques)
 
   return {
-    source: 'json',
+    source,
     bloques,
     items,
     meta: {
       totalBloques: bloques.length,
       totalIglesias: items.length,
-      sourceFile: 'server/data/iglesias-bloques.json'
+      ...(source === 'json' ? { sourceFile: 'server/data/iglesias-bloques.json' } : {})
     }
   }
+}
+
+export function loadIglesiasFromJson(): IglesiasApiResponse {
+  return buildIglesiasFromRawBloques(rawCatalog as IglesiaBloqueRaw[], 'json')
 }
 
 export function buildApiResponseFromFlatItems(

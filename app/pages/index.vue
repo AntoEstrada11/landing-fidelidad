@@ -14,14 +14,15 @@ useHead({
 </script>
 
 <template>
-  <main class="landing">
+  <main class="landing landing--mobile-pay-first">
     <LandingNav />
     <LandingHero />
+    <LandingDiezmoCta />
     <LandingTeaching />
     <LandingQueEsperar />
     <LandingTestimonials />
-    <LandingDiezmoCta />
     <LandingFag />
     <LandingFooter />
+    <LandingStickyCta />
   </main>
 </template>

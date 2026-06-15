@@ -22,7 +22,7 @@
         :aria-expanded="menuOpen"
         aria-controls="lp-nav-drawer"
         :aria-label="menuOpen ? 'Cerrar menú' : 'Abrir menú'"
-        @click="menuOpen = !menuOpen"
+        @click="toggleMenu"
       >
         <span class="lp-nav__toggle-bar" />
         <span class="lp-nav__toggle-bar" />
@@ -30,41 +30,88 @@
       </button>
     </div>
 
-    <Transition name="lp-nav-fade">
-      <button
-        v-if="menuOpen"
-        type="button"
-        class="lp-nav__backdrop"
-        aria-label="Cerrar menú"
-        @click="closeMenu"
-      />
-    </Transition>
+    <Teleport to="body">
+      <Transition name="lp-nav-fade">
+        <div
+          v-if="menuOpen"
+          class="lp-nav__overlay"
+          aria-label="Cerrar menú"
+          @click="closeMenu"
+        >
+          <aside
+            id="lp-nav-drawer"
+            class="lp-nav__drawer"
+            aria-label="Menú móvil"
+            @click.stop
+          >
+            <div class="lp-nav__drawer-head">
+              <p class="lp-nav__drawer-title">Menú</p>
+              <button
+                type="button"
+                class="lp-nav__drawer-close"
+                aria-label="Cerrar menú"
+                @click="closeMenu"
+              >
+                Cerrar
+              </button>
+            </div>
 
-    <nav
-      id="lp-nav-drawer"
-      class="lp-nav__drawer"
-      :class="{ 'lp-nav__drawer--open': menuOpen }"
-      :aria-hidden="!menuOpen"
-      aria-label="Menú móvil"
-    >
-      <a href="#inicio" @click="closeMenu">Inicio</a>
-      <a href="#que-es-fiel" @click="closeMenu">¿Qué es ser fiel a Dios?</a>
-      <a href="#que-esperar" @click="closeMenu">¿Qué esperar?</a>
-      <a href="#historias" @click="closeMenu">Historias reales</a>
-      <a href="#faq" @click="closeMenu">Preguntas frecuentes</a>
-      <a href="#voto" class="lp-btn lp-btn--primary lp-nav__cta" @click="closeMenu">
-        Hacer mi voto de fe
-      </a>
-    </nav>
+            <a
+              href="#voto"
+              class="lp-btn lp-btn--primary lp-btn--block lp-nav__drawer-cta"
+              data-track="nav.realizar_fidelidad"
+              data-track-section="nav_drawer"
+              @click="closeMenu"
+            >
+              Realizar mi fidelidad
+            </a>
+
+            <nav class="lp-nav__drawer-links" aria-label="Secciones">
+              <a
+                v-for="item in mobileLinks"
+                :key="item.href"
+                :href="item.href"
+                @click="closeMenu"
+              >
+                <span class="lp-nav__drawer-icon" aria-hidden="true">{{ item.icon }}</span>
+                <span class="lp-nav__drawer-label">{{ item.label }}</span>
+              </a>
+            </nav>
+
+            <div class="lp-nav__drawer-footer">
+              <a href="tel:+525555743266" class="lp-nav__drawer-help" @click="closeMenu">
+                <span aria-hidden="true">📞</span>
+                <span>
+                  <strong>¿Necesitas ayuda?</strong>
+                  <small>55 55 74 32 66</small>
+                </span>
+              </a>
+            </div>
+          </aside>
+        </div>
+      </Transition>
+    </Teleport>
   </header>
 </template>
 
 <script setup lang="ts">
+const mobileLinks = [
+  { href: '#inicio', label: 'Inicio', icon: '⌂' },
+  { href: '#que-es-fiel', label: '¿Qué es ser fiel?', icon: '✦' },
+  { href: '#que-esperar', label: '¿Qué esperar?', icon: '◎' },
+  { href: '#historias', label: 'Historias reales', icon: '♥' },
+  { href: '#faq', label: 'Preguntas frecuentes', icon: '?' }
+] as const
+
 const menuOpen = ref(false)
 const scrolled = ref(false)
 
 function closeMenu() {
   menuOpen.value = false
+}
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
 }
 
 function onScroll() {
@@ -96,5 +143,6 @@ onUnmounted(() => {
   window.removeEventListener('resize', onResize)
   window.removeEventListener('keydown', onEscape)
   document.body.style.overflow = ''
+  closeMenu()
 })
 </script>

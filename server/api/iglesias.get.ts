@@ -1,12 +1,34 @@
 import { IGLESIAS_FALLBACK } from '#shared/constants/iglesias-fallback'
 import type { IglesiasApiResponse } from '#shared/types/iglesia'
 import { buildApiResponseFromFlatItems, loadIglesiasFromJson } from '../utils/iglesias-catalog'
+import { fetchIglesiasFromSelectorApi } from '../utils/iglesias-api'
 import { fetchIglesiasFromOdoo } from '../utils/iglesias'
 
 export default defineCachedEventHandler(
   async (event): Promise<IglesiasApiResponse> => {
     const config = useRuntimeConfig(event)
-    const source = config.iglesias.source as 'json' | 'odoo'
+    const source = config.iglesias.source as 'json' | 'odoo' | 'api'
+
+    if (source === 'api') {
+      try {
+        const api = config.iglesias.api
+        return await fetchIglesiasFromSelectorApi({
+          url: api.url,
+          key: api.key,
+          timeoutMs: api.timeoutMs
+        })
+      } catch (error) {
+        if (config.iglesias.api.fallbackOnError) {
+          console.error('[api/iglesias] Selector API error, usando JSON local:', error)
+          return loadIglesiasFromJson()
+        }
+        throw createError({
+          statusCode: 502,
+          statusMessage: 'No se pudieron cargar las iglesias desde la API',
+          message: error instanceof Error ? error.message : 'Error desconocido'
+        })
+      }
+    }
 
     if (source === 'odoo') {
       try {

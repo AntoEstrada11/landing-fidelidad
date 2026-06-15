@@ -27,7 +27,7 @@
 
     <div class="lp-hero__inner container">
       <p class="lp-label lp-label--light">Propósito de fe</p>
-      <h1 class="lp-display lp-display--hero">
+      <h1 class="lp-display lp-display--hero lp-display--light">
         Descubre el poder de la
         <span>fidelidad a Dios</span>
       </h1>

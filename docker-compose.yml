@@ -1,0 +1,32 @@
+networks:
+  iglesias-net:
+    external: true
+
+services:
+  landing-fidelidad:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: landing-fidelidad:local
+    container_name: landing-fidelidad
+    ports:
+      - "3001:3000"
+    networks:
+      - iglesias-net
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      IGLESIAS_SOURCE: api
+      IGLESIAS_API_URL: http://mi-api-selector-container:3000/api/elementos
+      IGLESIAS_API_KEY: ${IGLESIAS_API_KEY:-}
+      NUXT_PUBLIC_LOCALIZADOR_URL: ${NUXT_PUBLIC_LOCALIZADOR_URL:-http://mi-api-selector-container:3000}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/iglesias"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3

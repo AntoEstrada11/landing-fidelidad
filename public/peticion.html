@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hoja de petición · Fidelidad a Dios</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #1a1a1a;
+      background: #e8e4df;
+      padding: 1.5rem;
+    }
+
+    .sheet {
+      max-width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      padding: 18mm 16mm;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .sheet__header {
+      text-align: center;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #b8860b;
+      margin-bottom: 1.25rem;
+    }
+
+    .sheet__org {
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #6b5b4a;
+    }
+
+    .sheet__title {
+      margin-top: 0.35rem;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #2c2416;
+    }
+
+    .sheet__subtitle {
+      margin-top: 0.35rem;
+      font-size: 0.88rem;
+      color: #5c4f3f;
+      font-style: italic;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b5b4a;
+      margin-bottom: 0.3rem;
+    }
+
+    .field__line {
+      border-bottom: 1px solid #2c2416;
+      min-height: 1.6rem;
+      font-size: 0.95rem;
+      padding: 0.15rem 0;
+    }
+
+    .field__area {
+      border: 1px solid #c9bfb0;
+      min-height: 140px;
+      padding: 0.65rem;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .field__area--large {
+      min-height: 200px;
+    }
+
+    .sheet__note {
+      margin-top: 1.25rem;
+      padding: 0.85rem 1rem;
+      background: #faf8f5;
+      border-left: 3px solid #b8860b;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: #4a4035;
+    }
+
+    .sheet__footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #ddd5c8;
+      font-size: 0.72rem;
+      line-height: 1.5;
+      color: #6b5b4a;
+      text-align: center;
+    }
+
+    .print-btn {
+      display: block;
+      width: fit-content;
+      margin: 1rem auto 0;
+      padding: 0.6rem 1.25rem;
+      font-family: system-ui, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #fff;
+      background: #8b6914;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .sheet { box-shadow: none; max-width: none; min-height: auto; }
+      .print-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <article class="sheet">
+    <header class="sheet__header">
+      <p class="sheet__org">Iglesia Universal del Reino de Dios</p>
+      <h1 class="sheet__title">Hoja de Petición</h1>
+      <p class="sheet__subtitle">Voto de fidelidad a Dios</p>
+    </header>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Nombre(s)</label>
+        <div class="field__line" id="nombres">&nbsp;</div>
+      </div>
+      <div class="field">
+        <label>Apellido(s)</label>
+        <div class="field__line" id="apellidos">&nbsp;</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Iglesia / Sede</label>
+        <div class="field__line" id="iglesia">&nbsp;</div>
+      </div>
+      <div class="field">
+        <label>Fecha</label>
+        <div class="field__line" id="fecha">&nbsp;</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Mi petición de fe</label>
+      <div class="field__area field__area--large" id="peticion">
+        Escribe aquí tu petición con fe y determinación.
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Importe de mi voto de fidelidad (referencia)</label>
+      <div class="field__line" id="importe">&nbsp;</div>
+    </div>
+
+    <p class="sheet__note">
+      <strong>Instrucciones:</strong> Imprime esta hoja, firma al pie si lo deseas y llévala al altar
+      de tu Universal junto con tu comprobante de voto. Sede Nacional: Av. Revolución #253,
+      col. Tacubaya · Soporte: 55 55 74 32 66
+    </p>
+
+    <footer class="sheet__footer">
+      Este documento es un acto personal de fe. Consérvalo hasta entregarlo en el altar.
+    </footer>
+  </article>
+
+  <button type="button" class="print-btn" onclick="window.print()">Imprimir hoja</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search)
+    const set = (id, value) => {
+      const el = document.getElementById(id)
+      if (el && value) el.textContent = value
+    }
+    set('nombres', params.get('nombres'))
+    set('apellidos', params.get('apellidos'))
+    set('iglesia', params.get('iglesia'))
+    set('importe', params.get('importe'))
+    set('peticion', params.get('peticion'))
+    set('fecha', params.get('fecha') || new Date().toLocaleDateString('es-MX', {
+      day: '2-digit', month: 'long', year: 'numeric'
+    }))
+  </script>
+</body>
+</html>
